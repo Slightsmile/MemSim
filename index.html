@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Memory Management Simulator</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="logo.png" type="image/png" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 id="page-title" class="welcome-headline">MemSim</h1>
+        <nav>
+          <a href="index.html" aria-current="page">Home</a>
+          <a href="first-fit.html">First Fit</a>
+          <a href="best-fit.html">Best Fit</a>
+          <a href="next-fit.html">Next Fit</a>
+          <a href="worst-fit.html">Worst Fit</a>
+          <a href="paging.html">Paging</a>
+          <a href="segmentation.html">Segmentation</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2>Welcome to the Memory Management Simulator!</h2>
+        <p class="tagline">
+          Step back in time to the era of Windows 98 and delve into the
+          fascinating world of operating system memory management. This
+          interactive simulator allows you to visualize and understand classic
+          memory allocation strategies in action.
+        </p>
+        <p class="instruction">
+          <strong>Ready to explore?</strong> Select an algorithm from the
+          navigation menu above to begin a simulation and see how memory is
+          efficiently allocated!
+        </p>
+
+        <h3>What is Memory Management?</h3>
+        <p>
+          Memory management is a crucial function of an operating system that
+          handles and supervises computer's primary memory. It allocates memory
+          space to processes and deallocates it when no longer needed, ensuring
+          efficient use of resources and preventing conflicts between different
+          programs. Effective memory management is vital for system stability,
+          performance, and multitasking capabilities.
+        </p>
+
+        <h3>Algorithms in this Simulator:</h3>
+        <ul>
+          <li>
+            <strong>First Fit:</strong> This algorithm scans memory from the
+            beginning and allocates the first contiguous memory block large
+            enough to satisfy the request. It's simple and fast but can lead to
+            external fragmentation.
+          </li>
+          <li>
+            <strong>Best Fit:</strong> This algorithm searches the entire memory
+            for the smallest available contiguous memory block that is large
+            enough to satisfy the request. It aims to minimize wasted space but
+            can be slower due to the search.
+          </li>
+          <li>
+            <strong>Next Fit:</strong> A variation of First Fit, Next Fit starts
+            searching for a suitable block from where the previous search ended,
+            rather than from the beginning of memory. This can lead to a more
+            even distribution of memory but might also result in more
+            fragmentation.
+          </li>
+          <li>
+            <strong>Worst Fit:</strong> This algorithm allocates the largest
+            available contiguous memory block to a process. The idea is that
+            allocating the largest block will leave a larger remaining free
+            block, which might be useful for larger future requests. However, it
+            often leads to many small, unusable fragments.
+          </li>
+          <li>
+            <strong>Paging:</strong> A non-contiguous memory allocation
+            technique where physical memory is divided into fixed-size blocks
+            called "frames," and logical memory is divided into same-size blocks
+            called "pages." Processes are loaded into available frames, and a
+            page table keeps track of where each page is stored. This technique
+            primarily tackles external fragmentation, but introduces internal
+            fragmentation.
+          </li>
+          <li>
+            <strong>Segmentation:</strong> A memory management technique that
+            divides a program into variable-sized logical units called
+            "segments." Each segment corresponds to a logical part of the
+            program (e.g., code, data, stack). Segmentation allows programs to
+            be loaded into non-contiguous memory blocks, promoting modularity
+            and protection, but it can suffer from external fragmentation.
+          </li>
+        </ul>
+      </main>
+    </div>
+
+    <div
+      class="info-circle"
+      tabindex="0"
+      onclick="location.href='info.html'"
+      onkeypress="if(event.key==='Enter')location.href='info.html'"
+    >
+      i
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

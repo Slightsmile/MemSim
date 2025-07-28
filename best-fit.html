@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Best Fit - Memory Management Simulator</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="logo.png" type="image/png" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 id="page-title">Best Fit Allocation</h1>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="first-fit.html">First Fit</a>
+          <a href="best-fit.html" aria-current="page">Best Fit</a>
+          <a href="next-fit.html">Next Fit</a>
+          <a href="worst-fit.html">Worst Fit</a>
+          <a href="paging.html">Paging</a>
+          <a href="segmentation.html">Segmentation</a>
+        </nav>
+      </header>
+
+      <main>
+        <div id="input-area"></div>
+        <div id="visualization" class="visualization-area"></div>
+        <div id="status" class="status-text"></div>
+      </main>
+    </div>
+
+    <div
+      class="info-circle"
+      tabindex="0"
+      onclick="location.href='info.html'"
+      onkeypress="if(event.key==='Enter')location.href='info.html'"
+    >
+      i
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

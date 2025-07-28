@@ -1,0 +1,258 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
+  background-color: white; /* Windows 98 white */
+  color: #000080; /* Windows 98 blue text */
+  user-select: none;
+  overflow: hidden;
+}
+
+.container {
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  border: 4px outset #000080;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px;
+  overflow: hidden;
+  color: #000080;
+  box-shadow: inset 2px 2px 5px #cccccc, inset -2px -2px 5px #ffffff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px outset #000080;
+  padding: 8px 12px;
+  user-select: text;
+  flex-shrink: 0;
+  background-color: #000080;
+  color: white;
+  font-weight: bold;
+  font-size: 1.4rem;
+  text-shadow: 1px 1px 0 #000040;
+  flex-wrap: wrap;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+nav a {
+  text-decoration: none;
+  color: white;
+  background-color: #000080;
+  border: 2px outset #000040;
+  padding: 4px 10px;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 #102060;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+nav a:hover,
+nav a:focus,
+nav a[aria-current="page"] {
+  border-style: inset;
+  background-color: #2744a3;
+  color: #ffffff;
+  outline: none;
+}
+
+.info-circle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #000080;
+  border: 2px outset #000040;
+  font-weight: bold;
+  font-size: 22px;
+  text-align: center;
+  line-height: 36px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 2px 2px 0 #102060;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.info-circle:hover,
+.info-circle:focus {
+  border-style: inset;
+  background-color: #2744a3;
+  color: #ffffff;
+  outline: none;
+}
+
+main {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background-color: white;
+  border: 4px inset #000080;
+  box-shadow: inset 2px 2px 5px #cccccc, inset -2px -2px 5px white;
+  display: flex;
+  flex-direction: column;
+  user-select: text;
+}
+
+main h2,
+main h3 {
+  color: #000080;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+main p,
+main ul {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+main ul {
+  padding-left: 25px;
+}
+
+main li {
+  margin-bottom: 5px;
+}
+
+label {
+  font-weight: bold;
+  color: #000080;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
+  font-size: 14px;
+  margin: 6px 10px 10px 0;
+  padding: 6px 10px;
+  border: 2px outset #000080;
+  box-shadow: 2px 2px 0 #102060;
+  background-color: white;
+  color: #000080;
+  user-select: text;
+}
+
+input:focus,
+select:focus,
+button:focus,
+textarea:focus {
+  outline: none;
+  border-style: inset;
+  background-color: #ffffff;
+  color: #000080;
+}
+
+button {
+  cursor: pointer;
+  font-weight: bold;
+  width: 140px;
+}
+
+.visualization-area {
+  margin-top: 20px;
+  background: #f0f4ff;
+  border: 3px inset #000080;
+  min-height: 300px;
+  padding: 12px;
+  position: relative;
+  font-family: monospace;
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: inset 1px 1px 4px white, inset -1px -1px 4px #8888ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #000080;
+}
+
+.mem-block {
+  position: relative;
+  height: 80px;
+  min-width: 60px;
+  border: 2px outset #000080;
+  background-color: #a0aaff;
+  box-shadow: 2px 2px 0 #102060;
+  color: #000080;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 28px;
+  user-select: none;
+  transition: background-color 0.5s ease;
+  cursor: default;
+}
+
+.mem-block.allocated {
+  background-color: #000080;
+  color: white;
+  box-shadow: 2px 2px 8px #0011ff;
+}
+
+.mem-block.fragment {
+  background-color: #e0e0ff;
+  color: #5555aa;
+  font-style: italic;
+  box-shadow: none;
+}
+
+.mem-label {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 11px;
+  color: #000080;
+  font-weight: normal;
+  user-select: none;
+}
+
+.status-text {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  min-height: 24px;
+  color: #000080;
+  user-select: none;
+}
+
+/* Scrollbar for visualization area */
+.visualization-area::-webkit-scrollbar {
+  height: 8px;
+}
+.visualization-area::-webkit-scrollbar-thumb {
+  background-color: #2744a3;
+  border-radius: 4px;
+}
+
+/* Responsive nav layout */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav a {
+    margin: 4px 0;
+  }
+
+  main {
+    padding: 10px;
+  }
+}
