@@ -3,6 +3,7 @@
 **MemSim** is a web-based visualization tool that simulates how different memory allocation strategies work in operating systems. Built using **HTML**, **JavaScript**, and **CSS**, this project helps learners understand core concepts of memory management through interactive demonstrations.
 
 🔗 **Live Site:** https://slightsmile.github.io/MemSim/
+
 ---
 
 ## 🌟 Features
