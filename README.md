@@ -20,6 +20,11 @@
 
 ---
 
+## 🛠️ Technologies Used
+- **HTML5** – Structure and layout of the web application
+- **CSS3** – Styling and responsive design
+- **JavaScript (Vanilla)** – Core logic and interactivity of memory simulation
+
 ## 📜 License
 This project is open source and available under the MIT License.
 Feel free to use and modify it for personal use.
