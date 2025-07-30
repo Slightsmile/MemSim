@@ -106,7 +106,6 @@ main {
   display: flex;
   flex-direction: column;
   user-select: text;
-  padding-bottom: 60px;
 }
 
 main h2,
@@ -244,5 +243,8 @@ button {
   header {
     font-size: 1rem;
     padding: 8px 6px;
+  }
+  main {
+    padding-bottom: 40px;
   }
 }
