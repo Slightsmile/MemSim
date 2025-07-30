@@ -240,19 +240,9 @@ button {
   background-color: #2744a3;
   border-radius: 4px;
 }
-
-/* Responsive nav layout */
-@media (max-width: 768px) {
-  nav {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav a {
-    margin: 4px 0;
-  }
-
-  main {
-    padding: 10px;
+@media (max-width: 600px) {
+  header {
+    font-size: 1rem;
+    padding: 8px 6px;
   }
 }
