@@ -29,4 +29,4 @@
 This project is open source and available under the MIT License.
 Feel free to use and modify it for personal use.
 
-> Developed as a part of Operating System Lab Project at Daffodil International University
+> Developed as a part of the Operating System Lab Project at Daffodil International University
