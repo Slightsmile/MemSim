@@ -33,12 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
       initSegmentation();
       break;
 
-    case "info":
-      // No JS needed on info page
+    case "info": // No JS needed on info page
       break;
 
-    default:
-      // unknown page
+    default: // unknown page
       break;
   }
 });
@@ -50,6 +48,18 @@ function parseSizes(text) {
     .split(",")
     .map((s) => parseInt(s.trim()))
     .filter((n) => !isNaN(n) && n > 0);
+}
+
+// Helper to parse named segments (e.g., 'Stack:100,Code:250')
+function parseNamedSegments(text) {
+  const segments = {};
+  text.split(",").forEach((s) => {
+    const parts = s.split(":").map((p) => p.trim());
+    if (parts.length === 2 && !isNaN(parseInt(parts[1]))) {
+      segments[parts[0]] = parseInt(parts[1]);
+    }
+  });
+  return segments;
 }
 
 function createMemBlock(label, size, allocated, animDelay = 0) {
@@ -77,15 +87,6 @@ function generateRandomSizes(count, min, max) {
   return sizes.join(", ");
 }
 
-// FadeIn animation keyframes added via JS on load
-const styleSheet = document.createElement("style");
-styleSheet.innerText = `
-@keyframes fadeIn {
-  0% {opacity: 0; transform: translateY(15px);}
-  100% {opacity: 1; transform: translateY(0);}
-}`;
-document.head.appendChild(styleSheet);
-
 // Animate allocation block color change - Changed color to match Windows 98 blue
 function animateAllocationBlock(block, color = "#000080", duration = 800) {
   block.style.transition = `background-color ${duration}ms ease`;
@@ -96,6 +97,139 @@ function animateAllocationBlock(block, color = "#000080", duration = 800) {
     block.style.color = "";
   }, duration);
 }
+
+// Creates a table and appends it to a target element
+function createTable(headers, data, targetElement) {
+  const table = document.createElement("table");
+  table.className = "results-table";
+  const thead = table.createTHead();
+  const tbody = table.createTBody(); // Create table headers
+
+  let headerRow = thead.insertRow();
+  headers.forEach((headerText) => {
+    let th = document.createElement("th");
+    th.textContent = headerText;
+    headerRow.appendChild(th);
+  }); // Create table body rows
+
+  data.forEach((rowData) => {
+    let row = tbody.insertRow();
+    rowData.forEach((cellData) => {
+      let cell = row.insertCell();
+      cell.textContent = cellData;
+    });
+  });
+
+  targetElement.appendChild(table);
+}
+
+// FadeIn animation keyframes and other styles added via JS on load
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+  @keyframes fadeIn {
+    0% {opacity: 0; transform: translateY(15px);}
+    100% {opacity: 1; transform: translateY(0);}
+  }
+  
+  /* Windows 98 Theme Styles */
+  body {
+    background-color: #008080; /* Teal background */
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+  }
+  .container {
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    background-color: #c0c0c0; /* Gray window background */
+    border: none;
+    box-shadow: none;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  h3 {
+    display: none;
+  }
+  .input-area {
+    margin-bottom: 20px;
+  }
+  .input-area label, .status {
+    color: #000;
+    font-weight: bold;
+  }
+  .input-area input[type="text"], .input-area input[type="number"] {
+    background-color: #fff;
+    border: 1px solid #808080;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+    padding: 2px 4px;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    width: 300px;
+    margin-bottom: 10px;
+  }
+  .input-area button {
+    background-color: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+    padding: 5px 15px;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+    box-shadow: 1px 1px 0 #000;
+  }
+  .input-area button:active {
+    border-color: #808080 #fff #fff #808080;
+  }
+
+  /* Table styles */
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 2px solid #fff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+  }
+  .results-table th, .results-table td {
+    border: 1px solid #c0c0c0;
+    padding: 5px;
+    text-align: left;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+  }
+  .results-table th {
+    background-color: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000;
+    padding: 5px 10px;
+  }
+  .results-table td {
+    background-color: #fff;
+  }
+  .results-table tr:nth-child(even) td {
+    background-color: #f0f0f0;
+  }
+  .results-table tr:hover td {
+    background-color: #e0e0e0;
+  }
+  .mem-block {
+    background-color: #e0e0e0;
+    border: 2px solid #808080;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+  }
+  .mem-block.allocated {
+    background-color: #000080;
+    color: white;
+  }
+`;
+document.head.appendChild(styleSheet);
 
 // ==== Landing Page (index.html) ====
 function initLanding() {
@@ -111,7 +245,7 @@ function initLanding() {
 // ==== First Fit ====
 
 function initFirstFit() {
-  setupInputArea("First Fit Allocation", "first-fit");
+  setupInputArea("first-fit");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulateFirstFit();
@@ -128,40 +262,59 @@ function populateRandomValuesFirstFit() {
   document.getElementById("processes").value = generateRandomSizes(5, 50, 500);
 }
 
-function setupInputArea(title, pageType) {
+function setupInputArea(pageType) {
   const inputArea = document.getElementById("input-area");
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
   if (!inputArea || !visualization || !status) return;
 
   let inputsHtml = "";
+  let title = "";
+
   if (pageType === "paging") {
+    title = "Paging Simulation";
     inputsHtml = `
       <label>Total Memory Size (KB):</label><br/>
-      <input id="total-memory" type="number" placeholder="e.g. 1024" style="width: 80%;" /><br/>
+      <input id="total-memory" type="number" placeholder="e.g. 1024" /><br/>
       <label>Page Size (KB):</label><br/>
-      <input id="page-size" type="number" placeholder="e.g. 128" style="width: 80%;" /><br/>
+      <input id="page-size" type="number" placeholder="e.g. 128" /><br/>
       <label>Processes (comma separated sizes):</label><br/>
-      <input id="processes" type="text" placeholder="200, 450, 100, 300" style="width: 80%;" /><br/>
+      <input id="processes" type="text" placeholder="200, 450, 100, 300" /><br/>
     `;
   } else if (pageType === "segmentation") {
+    title = "Segmentation Allocation";
     inputsHtml = `
       <label>Memory Segments (comma separated sizes):</label><br/>
-      <input id="memory-segments" type="text" placeholder="100, 500, 200, 300, 600" style="width: 80%;" /><br/>
-      <label>Process Segments (comma separated sizes):</label><br/>
-      <input id="process-segments" type="text" placeholder="212, 417, 112, 426" style="width: 80%;" /><br/>
+      <input id="memory-segments" type="text" placeholder="100, 500, 200, 300, 600" /><br/>
+      <label>Process Segments (Name:Size, comma separated):</label><br/>
+      <input id="process-segments" type="text" placeholder="Stack:212, Code:417, Data:112, Heap:426" /><br/>
     `;
   } else {
     // For First Fit, Best Fit, Next Fit, Worst Fit
+    switch (pageType) {
+      case "first-fit":
+        title = "First Fit Allocation";
+        break;
+      case "best-fit":
+        title = "Best Fit Allocation";
+        break;
+      case "next-fit":
+        title = "Next Fit Allocation";
+        break;
+      case "worst-fit":
+        title = "Worst Fit Allocation";
+        break;
+    }
     inputsHtml = `
       <label>Memory Blocks (comma separated sizes):</label><br/>
-      <input id="memory-blocks" type="text" placeholder="100, 500, 200, 300, 600" style="width: 80%;" /><br/>
+      <input id="memory-blocks" type="text" placeholder="100, 500, 200, 300, 600" /><br/>
       <label>Processes (comma separated sizes):</label><br/>
-      <input id="processes" type="text" placeholder="212, 417, 112, 426" style="width: 80%;" /><br/>
+      <input id="processes" type="text" placeholder="212, 417, 112, 426" /><br/>
     `;
   }
 
   inputArea.innerHTML = `
+    <h3>${title}</h3>
     ${inputsHtml}
     <button id="start-btn">Start Allocation</button>
     <button id="random-btn">Random Values</button>
@@ -177,6 +330,17 @@ async function simulateFirstFit() {
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
 
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
+
   const memoryBlocks = parseSizes(memInput);
   const processes = parseSizes(procInput);
 
@@ -185,7 +349,6 @@ async function simulateFirstFit() {
     return;
   }
 
-  // Show memory blocks initially (free)
   visualization.innerHTML = "";
   let blocks = memoryBlocks.map((size, i) => ({
     size,
@@ -198,7 +361,8 @@ async function simulateFirstFit() {
 
   status.textContent = "Starting First Fit Allocation...";
 
-  // Allocate each process
+  const allocationData = [];
+
   for (let i = 0; i < processes.length; i++) {
     const pSize = processes[i];
     status.textContent = `Allocating Process ${i + 1} (${pSize} KB)...`;
@@ -207,9 +371,9 @@ async function simulateFirstFit() {
     let allocated = false;
     for (let j = 0; j < blocks.length; j++) {
       if (!blocks[j].allocated && blocks[j].size >= pSize) {
-        // allocate block to process
         blocks[j].allocated = true;
-        blocks[j].freeSize = blocks[j].size - pSize;
+        const fragmentSize = blocks[j].size - pSize;
+        blocks[j].freeSize = fragmentSize;
         blocks[j].element.classList.add("allocated");
         blocks[j].element.textContent = "";
         const memLabel = document.createElement("div");
@@ -217,18 +381,19 @@ async function simulateFirstFit() {
         memLabel.textContent = `Block ${j + 1}`;
         blocks[j].element.appendChild(memLabel);
         blocks[j].element.appendChild(
-          document.createTextNode(`${pSize} KB Allocated`)
+          document.createTextNode(`P${i + 1} (${pSize} KB)`)
         );
         animateAllocationBlock(blocks[j].element);
 
-        // If leftover fragment exists, show it as a new block after delay
-        if (blocks[j].freeSize > 0) {
+        allocationData.push([`P${i + 1}`, `${pSize} KB`, `Block ${j + 1}`]);
+
+        if (fragmentSize > 0) {
           await delay(600);
           const fragBlock = {
-            size: blocks[j].freeSize,
+            size: fragmentSize,
             allocated: false,
-            element: createMemBlock(`Fragment`, blocks[j].freeSize, false),
-            freeSize: blocks[j].freeSize,
+            element: createMemBlock(`Fragment`, fragmentSize, false),
+            freeSize: fragmentSize,
           };
           blocks.splice(j + 1, 0, fragBlock);
           visualization.insertBefore(
@@ -247,6 +412,7 @@ async function simulateFirstFit() {
       status.textContent = `Process ${
         i + 1
       } (${pSize} KB) could NOT be allocated (No fit found).`;
+      allocationData.push([`P${i + 1}`, `${pSize} KB`, "Not Allocated"]);
       await delay(1500);
     } else {
       status.textContent = `Process ${
@@ -256,17 +422,22 @@ async function simulateFirstFit() {
     }
   }
 
-  // Show fragmentation summary
   let totalFree = blocks
     .filter((b) => !b.allocated)
     .reduce((a, b) => a + b.size, 0);
   status.textContent = `Allocation done. Total external fragmentation: ${totalFree} KB`;
+
+  createTable(
+    ["Process", "Size", "Allocated Block"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Best Fit ====
 
 function initBestFit() {
-  setupInputArea("Best Fit Allocation", "best-fit");
+  setupInputArea("best-fit");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulateBestFit();
@@ -289,6 +460,17 @@ async function simulateBestFit() {
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
 
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
+
   const memoryBlocks = parseSizes(memInput);
   const processes = parseSizes(procInput);
 
@@ -309,12 +491,13 @@ async function simulateBestFit() {
 
   status.textContent = "Starting Best Fit Allocation...";
 
+  const allocationData = [];
+
   for (let i = 0; i < processes.length; i++) {
     const pSize = processes[i];
     status.textContent = `Allocating Process ${i + 1} (${pSize} KB)...`;
-    await delay(1000);
+    await delay(1000); // Find best fit block (smallest free block >= pSize)
 
-    // Find best fit block (smallest free block >= pSize)
     let bestIndex = -1;
     let bestSize = Infinity;
 
@@ -334,13 +517,14 @@ async function simulateBestFit() {
       status.textContent = `Process ${
         i + 1
       } (${pSize} KB) could NOT be allocated (No fit found).`;
+      allocationData.push([`P${i + 1}`, `${pSize} KB`, "Not Allocated"]);
       await delay(1500);
       continue;
-    }
+    } // Allocate block
 
-    // Allocate block
     blocks[bestIndex].allocated = true;
-    blocks[bestIndex].freeSize = blocks[bestIndex].size - pSize;
+    const fragmentSize = blocks[bestIndex].size - pSize;
+    blocks[bestIndex].freeSize = fragmentSize;
     blocks[bestIndex].element.classList.add("allocated");
     blocks[bestIndex].element.textContent = "";
     const memLabel = document.createElement("div");
@@ -348,17 +532,19 @@ async function simulateBestFit() {
     memLabel.textContent = `Block ${bestIndex + 1}`;
     blocks[bestIndex].element.appendChild(memLabel);
     blocks[bestIndex].element.appendChild(
-      document.createTextNode(`${pSize} KB Allocated`)
+      document.createTextNode(`P${i + 1} (${pSize} KB)`)
     );
     animateAllocationBlock(blocks[bestIndex].element);
 
-    if (blocks[bestIndex].freeSize > 0) {
+    allocationData.push([`P${i + 1}`, `${pSize} KB`, `Block ${bestIndex + 1}`]);
+
+    if (fragmentSize > 0) {
       await delay(600);
       const fragBlock = {
-        size: blocks[bestIndex].freeSize,
+        size: fragmentSize,
         allocated: false,
-        element: createMemBlock(`Fragment`, blocks[bestIndex].freeSize, false),
-        freeSize: blocks[bestIndex].freeSize,
+        element: createMemBlock(`Fragment`, fragmentSize, false),
+        freeSize: fragmentSize,
       };
       blocks.splice(bestIndex + 1, 0, fragBlock);
       visualization.insertBefore(
@@ -377,12 +563,18 @@ async function simulateBestFit() {
     .filter((b) => !b.allocated)
     .reduce((a, b) => a + b.size, 0);
   status.textContent = `Allocation done. Total external fragmentation: ${totalFree} KB`;
+
+  createTable(
+    ["Process", "Size", "Allocated Block"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Next Fit ====
 
 function initNextFit() {
-  setupInputArea("Next Fit Allocation", "next-fit");
+  setupInputArea("next-fit");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulateNextFit();
@@ -405,6 +597,17 @@ async function simulateNextFit() {
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
 
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
+
   const memoryBlocks = parseSizes(memInput);
   const processes = parseSizes(procInput);
 
@@ -426,6 +629,7 @@ async function simulateNextFit() {
   status.textContent = "Starting Next Fit Allocation...";
 
   let lastIndex = 0;
+  const allocationData = [];
 
   for (let i = 0; i < processes.length; i++) {
     const pSize = processes[i];
@@ -439,7 +643,8 @@ async function simulateNextFit() {
     while (searchedBlocks < blocks.length) {
       if (!blocks[j].allocated && blocks[j].size >= pSize) {
         blocks[j].allocated = true;
-        blocks[j].freeSize = blocks[j].size - pSize;
+        const fragmentSize = blocks[j].size - pSize;
+        blocks[j].freeSize = fragmentSize;
         blocks[j].element.classList.add("allocated");
         blocks[j].element.textContent = "";
         const memLabel = document.createElement("div");
@@ -447,16 +652,19 @@ async function simulateNextFit() {
         memLabel.textContent = `Block ${j + 1}`;
         blocks[j].element.appendChild(memLabel);
         blocks[j].element.appendChild(
-          document.createTextNode(`${pSize} KB Allocated`)
+          document.createTextNode(`P${i + 1} (${pSize} KB)`)
         );
         animateAllocationBlock(blocks[j].element);
-        if (blocks[j].freeSize > 0) {
+
+        allocationData.push([`P${i + 1}`, `${pSize} KB`, `Block ${j + 1}`]);
+
+        if (fragmentSize > 0) {
           await delay(600);
           const fragBlock = {
-            size: blocks[j].freeSize,
+            size: fragmentSize,
             allocated: false,
-            element: createMemBlock(`Fragment`, blocks[j].freeSize, false),
-            freeSize: blocks[j].freeSize,
+            element: createMemBlock(`Fragment`, fragmentSize, false),
+            freeSize: fragmentSize,
           };
           blocks.splice(j + 1, 0, fragBlock);
           visualization.insertBefore(
@@ -477,6 +685,7 @@ async function simulateNextFit() {
       status.textContent = `Process ${
         i + 1
       } (${pSize} KB) could NOT be allocated (No fit found).`;
+      allocationData.push([`P${i + 1}`, `${pSize} KB`, "Not Allocated"]);
       await delay(1500);
     } else {
       status.textContent = `Process ${
@@ -490,12 +699,18 @@ async function simulateNextFit() {
     .filter((b) => !b.allocated)
     .reduce((a, b) => a + b.size, 0);
   status.textContent = `Allocation done. Total external fragmentation: ${totalFree} KB`;
+
+  createTable(
+    ["Process", "Size", "Allocated Block"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Worst Fit ====
 
 function initWorstFit() {
-  setupInputArea("Worst Fit Allocation", "worst-fit");
+  setupInputArea("worst-fit");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulateWorstFit();
@@ -518,6 +733,17 @@ async function simulateWorstFit() {
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
 
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
+
   const memoryBlocks = parseSizes(memInput);
   const processes = parseSizes(procInput);
 
@@ -538,12 +764,13 @@ async function simulateWorstFit() {
 
   status.textContent = "Starting Worst Fit Allocation...";
 
+  const allocationData = [];
+
   for (let i = 0; i < processes.length; i++) {
     const pSize = processes[i];
     status.textContent = `Allocating Process ${i + 1} (${pSize} KB)...`;
-    await delay(1000);
+    await delay(1000); // Find worst fit block (largest free block >= pSize)
 
-    // Find worst fit block (largest free block >= pSize)
     let worstIndex = -1;
     let worstSize = -1;
 
@@ -563,12 +790,14 @@ async function simulateWorstFit() {
       status.textContent = `Process ${
         i + 1
       } (${pSize} KB) could NOT be allocated (No fit found).`;
+      allocationData.push([`P${i + 1}`, `${pSize} KB`, "Not Allocated"]);
       await delay(1500);
       continue;
     }
 
     blocks[worstIndex].allocated = true;
-    blocks[worstIndex].freeSize = blocks[worstIndex].size - pSize;
+    const fragmentSize = blocks[worstIndex].size - pSize;
+    blocks[worstIndex].freeSize = fragmentSize;
     blocks[worstIndex].element.classList.add("allocated");
     blocks[worstIndex].element.textContent = "";
     const memLabel = document.createElement("div");
@@ -576,17 +805,23 @@ async function simulateWorstFit() {
     memLabel.textContent = `Block ${worstIndex + 1}`;
     blocks[worstIndex].element.appendChild(memLabel);
     blocks[worstIndex].element.appendChild(
-      document.createTextNode(`${pSize} KB Allocated`)
+      document.createTextNode(`P${i + 1} (${pSize} KB)`)
     );
     animateAllocationBlock(blocks[worstIndex].element);
 
-    if (blocks[worstIndex].freeSize > 0) {
+    allocationData.push([
+      `P${i + 1}`,
+      `${pSize} KB`,
+      `Block ${worstIndex + 1}`,
+    ]);
+
+    if (fragmentSize > 0) {
       await delay(600);
       const fragBlock = {
-        size: blocks[worstIndex].freeSize,
+        size: fragmentSize,
         allocated: false,
-        element: createMemBlock(`Fragment`, blocks[worstIndex].freeSize, false),
-        freeSize: blocks[worstIndex].freeSize,
+        element: createMemBlock(`Fragment`, fragmentSize, false),
+        freeSize: fragmentSize,
       };
       blocks.splice(worstIndex + 1, 0, fragBlock);
       visualization.insertBefore(
@@ -605,12 +840,18 @@ async function simulateWorstFit() {
     .filter((b) => !b.allocated)
     .reduce((a, b) => a + b.size, 0);
   status.textContent = `Allocation done. Total external fragmentation: ${totalFree} KB`;
+
+  createTable(
+    ["Process", "Size", "Allocated Block"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Paging ====
 
 function initPaging() {
-  setupInputArea("Paging Simulation", "paging");
+  setupInputArea("paging");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulatePaging();
@@ -623,18 +864,17 @@ function populateRandomValuesPaging() {
   const pageSizeInput = document.getElementById("page-size");
   const processesInput = document.getElementById("processes");
 
-  // Random total memory, ensure it's a multiple of a reasonable page size
-  let totalMem = Math.floor(Math.random() * (2048 - 512 + 1) + 512); // 512KB to 2048KB
-  let pageSize = [32, 64, 128, 256][Math.floor(Math.random() * 4)]; // Common page sizes
-  totalMem = Math.ceil(totalMem / pageSize) * pageSize; // Ensure total memory is a multiple of page size
+  let totalMem = Math.floor(Math.random() * (2048 - 512 + 1) + 512);
+  let pageSize = [32, 64, 128, 256][Math.floor(Math.random() * 4)];
+  totalMem = Math.ceil(totalMem / pageSize) * pageSize;
 
   totalMemInput.value = totalMem;
   pageSizeInput.value = pageSize;
   processesInput.value = generateRandomSizes(
-    Math.floor(Math.random() * (6 - 3 + 1)) + 3, // 3 to 6 processes
+    Math.floor(Math.random() * (6 - 3 + 1)) + 3,
     pageSize / 2,
     pageSize * 3
-  ); // Process sizes relative to page size
+  );
 }
 
 async function simulatePaging() {
@@ -643,6 +883,17 @@ async function simulatePaging() {
   const procInput = document.getElementById("processes").value;
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
+
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
 
   if (isNaN(totalMem) || totalMem <= 0 || isNaN(pageSize) || pageSize <= 0) {
     status.textContent = "Please enter valid total memory size and page size.";
@@ -659,12 +910,10 @@ async function simulatePaging() {
   visualization.innerHTML = "";
   status.textContent = "Starting Paging simulation...";
 
-  // Calculate total number of frames
   const totalFrames = Math.floor(totalMem / pageSize);
-  // Visualize all frames as free blocks initially
   let frames = [];
   for (let i = 0; i < totalFrames; i++) {
-    const frameBlock = createMemBlock(`Frame ${i + 1}`, pageSize, false);
+    const frameBlock = createMemBlock(`Frame ${i}`, pageSize, false);
     visualization.appendChild(frameBlock);
     frames.push({
       index: i,
@@ -674,15 +923,17 @@ async function simulatePaging() {
     });
   }
 
-  // Allocate pages for each process
+  const allocationData = [];
+  let totalProcessMem = 0;
+
   for (let i = 0; i < processes.length; i++) {
     let pSize = processes[i];
+    totalProcessMem += pSize;
     let pagesNeeded = Math.ceil(pSize / pageSize);
     status.textContent = `Allocating Process ${
       i + 1
     } (${pSize} KB, ${pagesNeeded} pages)...`;
 
-    // Find free frames for this process
     let freeFrames = frames.filter((f) => !f.allocated);
 
     if (freeFrames.length < pagesNeeded) {
@@ -693,7 +944,6 @@ async function simulatePaging() {
       continue;
     }
 
-    // Allocate pages sequentially
     for (let j = 0; j < pagesNeeded; j++) {
       let frame = freeFrames[j];
       frame.allocated = true;
@@ -702,28 +952,33 @@ async function simulatePaging() {
       frame.element.textContent = "";
       const memLabel = document.createElement("div");
       memLabel.className = "mem-label";
-      memLabel.textContent = `Frame ${frame.index + 1}`;
+      memLabel.textContent = `Frame ${frame.index}`;
       frame.element.appendChild(memLabel);
       frame.element.appendChild(document.createTextNode(`P${i + 1}`));
+      allocationData.push([`P${i + 1}`, `Page ${j}`, `Frame ${frame.index}`]);
       await delay(500);
     }
     status.textContent = `Process ${i + 1} allocated ${pagesNeeded} pages.`;
     await delay(1000);
   }
 
-  // Calculate fragmentation: internal fragmentation = total allocated frames * pageSize - sum of process sizes
   let allocatedFrames = frames.filter((f) => f.allocated).length;
   let totalAllocatedMem = allocatedFrames * pageSize;
-  let totalProcessMem = processes.reduce((a, b) => a + b, 0);
   let internalFrag = totalAllocatedMem - totalProcessMem;
 
   status.textContent = `Paging done. Internal Fragmentation: ${internalFrag} KB`;
+
+  createTable(
+    ["Process", "Page", "Allocated Frame"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Segmentation ====
 
 function initSegmentation() {
-  setupInputArea("Segmentation Allocation", "segmentation");
+  setupInputArea("segmentation");
 
   document.getElementById("start-btn").onclick = async () => {
     await simulateSegmentation();
@@ -734,15 +989,20 @@ function initSegmentation() {
 
 function populateRandomValuesSegmentation() {
   document.getElementById("memory-segments").value = generateRandomSizes(
-    Math.floor(Math.random() * (7 - 4 + 1)) + 4, // 4 to 7 memory segments
+    Math.floor(Math.random() * (7 - 4 + 1)) + 4,
     100,
     1000
   );
-  document.getElementById("process-segments").value = generateRandomSizes(
-    Math.floor(Math.random() * (6 - 3 + 1)) + 3, // 3 to 6 process segments
-    50,
-    700
-  );
+  const segmentNames = ["Stack", "Code", "Heap", "Data"];
+  const processSegments = [];
+  const count = Math.floor(Math.random() * (4 - 2 + 1)) + 2;
+  for (let i = 0; i < count; i++) {
+    const name = segmentNames[i];
+    const size = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
+    processSegments.push(`${name}:${size}`);
+  }
+  document.getElementById("process-segments").value =
+    processSegments.join(", ");
 }
 
 async function simulateSegmentation() {
@@ -751,10 +1011,24 @@ async function simulateSegmentation() {
   const visualization = document.getElementById("visualization");
   const status = document.getElementById("status");
 
-  const memorySegments = parseSizes(memInput);
-  const processSegments = parseSizes(procInput);
+  let resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) {
+    resultsContainer = document.createElement("div");
+    resultsContainer.id = "results-container";
+    visualization.parentNode.insertBefore(
+      resultsContainer,
+      visualization.nextSibling
+    );
+  }
+  resultsContainer.innerHTML = "";
 
-  if (memorySegments.length === 0 || processSegments.length === 0) {
+  const memorySegments = parseSizes(memInput);
+  const processSegments = parseNamedSegments(procInput);
+
+  if (
+    memorySegments.length === 0 ||
+    Object.keys(processSegments).length === 0
+  ) {
     status.textContent =
       "Please enter valid memory segments and process segments.";
     return;
@@ -762,51 +1036,66 @@ async function simulateSegmentation() {
 
   visualization.innerHTML = "";
 
-  // Show memory segments as free
   let memSegs = memorySegments.map((size, i) => ({
     size,
     allocated: false,
-    element: createMemBlock(`Segment ${i + 1}`, size, false),
+    element: createMemBlock(`Memory Segment ${i + 1}`, size, false),
     freeSize: size,
+    base: 0,
   }));
 
-  memSegs.forEach((b) => visualization.appendChild(b.element));
+  let currentBase = 0;
+  memSegs.forEach((seg) => {
+    seg.base = currentBase;
+    currentBase += seg.size;
+    visualization.appendChild(seg.element);
+  });
+
   status.textContent = "Starting Segmentation allocation...";
 
-  // Allocate each process segment to first suitable memory segment (like First Fit)
+  const allocationData = [];
   let procIndex = 0;
 
-  while (procIndex < processSegments.length) {
-    let pSize = processSegments[procIndex];
-    status.textContent = `Allocating Process Segment ${
-      procIndex + 1
-    } (${pSize} KB)...`;
+  for (const segName in processSegments) {
+    const pSize = processSegments[segName];
+    status.textContent = `Allocating Process Segment '${segName}' (${pSize} KB)...`;
     await delay(1000);
 
     let allocated = false;
 
     for (let i = 0; i < memSegs.length; i++) {
       if (!memSegs[i].allocated && memSegs[i].size >= pSize) {
+        const allocatedBase = memSegs[i].base;
+        const fragmentSize = memSegs[i].size - pSize;
+
         memSegs[i].allocated = true;
-        memSegs[i].freeSize = memSegs[i].size - pSize;
+        memSegs[i].freeSize = fragmentSize;
         memSegs[i].element.classList.add("allocated");
         memSegs[i].element.textContent = "";
         const memLabel = document.createElement("div");
         memLabel.className = "mem-label";
-        memLabel.textContent = `Segment ${i + 1}`;
+        memLabel.textContent = `${segName}`;
         memSegs[i].element.appendChild(memLabel);
         memSegs[i].element.appendChild(
-          document.createTextNode(`${pSize} KB Allocated`)
+          document.createTextNode(`Base: ${allocatedBase} Limit: ${pSize}`)
         );
         animateAllocationBlock(memSegs[i].element);
 
-        if (memSegs[i].freeSize > 0) {
+        allocationData.push([
+          segName,
+          `${pSize} KB`,
+          `${allocatedBase} KB`,
+          "Allocated",
+        ]);
+
+        if (fragmentSize > 0) {
           await delay(600);
           const fragBlock = {
-            size: memSegs[i].freeSize,
+            size: fragmentSize,
             allocated: false,
-            element: createMemBlock(`Fragment`, memSegs[i].freeSize, false),
-            freeSize: memSegs[i].freeSize,
+            element: createMemBlock(`Fragment`, fragmentSize, false),
+            freeSize: fragmentSize,
+            base: allocatedBase + pSize,
           };
           memSegs.splice(i + 1, 0, fragBlock);
           visualization.insertBefore(
@@ -822,14 +1111,11 @@ async function simulateSegmentation() {
     }
 
     if (!allocated) {
-      status.textContent = `Process Segment ${
-        procIndex + 1
-      } (${pSize} KB) could NOT be allocated.`;
+      status.textContent = `Process Segment '${segName}' (${pSize} KB) could NOT be allocated.`;
+      allocationData.push([segName, `${pSize} KB`, "N/A", "Not Allocated"]);
       await delay(1500);
     } else {
-      status.textContent = `Process Segment ${
-        procIndex + 1
-      } allocated successfully.`;
+      status.textContent = `Process Segment '${segName}' allocated successfully.`;
       await delay(1000);
     }
     procIndex++;
@@ -839,6 +1125,12 @@ async function simulateSegmentation() {
     .filter((b) => !b.allocated)
     .reduce((a, b) => a + b.size, 0);
   status.textContent = `Segmentation done. Total external fragmentation: ${totalFree} KB`;
+
+  createTable(
+    ["Segment Name", "Limit (Size)", "Base Address", "Status"],
+    allocationData,
+    resultsContainer
+  );
 }
 
 // ==== Utility delay ====
